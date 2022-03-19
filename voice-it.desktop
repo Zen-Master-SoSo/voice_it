@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Voice-it
+Comment=Copies text from a browser to your desktop in real time - ideal for using your voice's voice input instead of your keyboard.
+GenericName=Voice-it
+Exec=/usr/bin/python3 /usr/lib/python3.8/site-packages/voice-it/voice-it.py
+Icon=/usr/lib/python3.8/site-packages/voice-it/voice-it.svg
+Terminal=false
+Categories=Utilities;
