@@ -17,6 +17,5 @@ sudo chmod 0644 /usr/lib/python3.8/site-packages/voice-it/interface.html
 sudo chmod 0644 /usr/lib/python3.8/site-packages/voice-it/favicon.ico
 sudo cp voice-it.desktop /usr/share/applications/voice-it.desktop
 sudo chmod 0644 /usr/share/applications/voice-it.desktop
-sudo /usr/sbin/ufw delete allow in to any port 8585
 sudo /usr/sbin/ufw allow in to any port 8585 comment 'Voice-it' &> /dev/null
 echo "Complete!"

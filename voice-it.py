@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 
 from interface import Ui_MainWindow
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socket import socket, AF_INET, SOCK_DGRAM
 import traceback, sys, os
 
 server = None
@@ -42,26 +43,26 @@ class RequestHandler(BaseHTTPRequestHandler):
 		server.show_progress(self.requestline, None, 1500)
 		if self.path == '/':
 			path = os.path.join(os.path.dirname(__file__), 'interface.html')
-			stat = os.stat(path)
 			self.send_response(200)
 			self.send_header('Content-Type', 'text/html');
-			self.send_header('Content-Length', stat.st_size)
-			self.send_header('Last-Modified', self.date_time_string(stat.st_mtime))
-			self.end_headers()
+			self.send_stat_headers(path)
 			with open(path) as fh:
 				self.wfile.write(fh.read().encode())
 		elif self.path == '/favicon.ico':
 			path = os.path.join(os.path.dirname(__file__), 'favicon.ico')
-			stat = os.stat(path)
 			self.send_response(200)
 			self.send_header('Content-Type', 'image/vnd.microsoft.icon');
-			self.send_header('Content-Length', stat.st_size)
-			self.send_header('Last-Modified', self.date_time_string(stat.st_mtime))
-			self.end_headers()
+			self.send_stat_headers(path)
 			with open(path, mode='rb') as fh:
 				self.wfile.write(fh.read())
 		else:
-			self.send_response(404)
+			self.send_response(204)	# No Content
+
+	def send_stat_headers(self, path):
+		stat = os.stat(path)
+		self.send_header('Content-Length', stat.st_size)
+		self.send_header('Last-Modified', self.date_time_string(stat.st_mtime))
+		self.end_headers()
 
 
 	def do_POST(self):
@@ -84,7 +85,7 @@ class Server(QRunnable):
 		try:
 			self._enabled = True
 			self._http = HTTPServer(('', 8585), RequestHandler)
-			self.show_progress('Listening', None, 0)
+			self.show_progress('Listening ...', None, 0)
 			self._http.serve_forever()
 			self.show_progress('Closing', None, 0)
 		except:
@@ -118,6 +119,10 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.copyButton.clicked.connect(self.copy)
 		pixmap = QPixmap(os.path.join(os.path.dirname(__file__), 'voice-it.png'))
 		self.iconLabel.setPixmap(pixmap)
+		sock = socket(AF_INET, SOCK_DGRAM)
+		sock.connect(('8.8.8.8', 7))
+		url = ('http://%s:8585' % sock.getsockname()[0])
+		self.linkLabel.setText('<a href="%s">link</a>' % url);
 		self.threadpool = QThreadPool()
 		server = Server()
 		server.signals.result.connect(self.show_status)

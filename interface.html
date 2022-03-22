@@ -11,7 +11,37 @@ window.onload = function() {
 
 	var textArea = document.getElementById("text-area"),
 		clearButton = document.getElementById("clear-button"),
+		mustPost = false,
 		mayPost = true;
+
+	function postChanges() {
+		var request = new XMLHttpRequest();
+		var timedOut = false;
+		request.onreadystatechange = function() {
+			if(request.readyState === 4) {
+				mayPost = true;
+				clearTimeout(timer);
+				if(request.status == '200') {
+					textArea.setAttribute('class', 'comms-up');
+				} else if(request.status == '0') {
+					textArea.setAttribute('class', 'comms-down');
+				}
+			}
+			if(timedOut) {
+				setTimeout(postChanges, 5000);
+			} else if(mustPost) {
+				setTimeout(postChanges, 10);
+			}
+		}
+		request.open("POST", "/");
+		request.send(textArea.value);
+		var timer = setTimeout(function() {
+			console.log('timed out');
+			timedOut = true;
+			request.abort();
+			textArea.class = "comms-down";
+		}, 4000);
+	}
 
 	clearButton.onclick = function() {
 		textArea.value = "";
@@ -19,12 +49,9 @@ window.onload = function() {
 
 	textArea.onkeyup = function() {
 		if(mayPost) {
-			var request = new XMLHttpRequest();
-			request.onreadystatechange = function() {
-				if(request.readyState === 4) mayPost = true;
-			}
-			request.open("POST", "/");
-			request.send(textArea.value);
+			postChanges();
+		} else {
+			mustPost = true;
 		}
 	}
 
@@ -56,6 +83,15 @@ body > div {
 	font-size: 21px;
 	padding: 12px;
 	flex-grow: 1;
+	background-color: #E7E7E7;
+}
+
+#text-area.comms-up {
+	background-color: #FFF;
+}
+
+#text-area.comms-down {
+	background-color: #AAA;
 }
 
 </style>
