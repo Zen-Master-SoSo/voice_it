@@ -113,9 +113,13 @@ class Window(QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		global server
 		super(Window, self).__init__(None)
+		settings = QSettings('Voice-It', 'voice-it')
+		if settings.contains('geometry'):
+			self.restoreGeometry(settings.value('geometry'));
+		if settings.contains('windowstate'):
+			self.restoreState(settings.value('windowstate'));
 		self.setupUi(self)
 		self.setWindowTitle('Voice-it')
-		self.move(10,10)
 		self.copyButton.clicked.connect(self.copy)
 		pixmap = QPixmap(os.path.join(os.path.dirname(__file__), 'voice-it.png'))
 		self.iconLabel.setPixmap(pixmap)
@@ -138,6 +142,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
 	def closeEvent(self, event):
 		server.quit()
+		settings = QSettings('Voice-It', 'voice-it')
+		settings.setValue('geometry', self.saveGeometry())
+		settings.setValue('windowstate', self.saveState())
 
 	def show_status(self, obj):
 		self.statusbar.showMessage(obj['stat'], obj['dur']);
@@ -149,7 +156,6 @@ class Window(QMainWindow, Ui_MainWindow):
 		self.statusbar.showMessage(err[1]);
 
 	def finished(self):
-		#self.statusbar.showMessage('Server stopped!');
 		pass
 
 
