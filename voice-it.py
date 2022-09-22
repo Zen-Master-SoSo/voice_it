@@ -137,7 +137,7 @@ class Window(QMainWindow, Ui_MainWindow):
 	def copy(self):
 		text = self.textBox.toPlainText()
 		if len(text):
-			QGuiApplication.clipboard().setText(self.textBox.toPlainText())
+			QGuiApplication.clipboard().setText(text)
 			self.statusbar.showMessage('Text copied to the clipboard', 2000)
 
 	def closeEvent(self, event):
