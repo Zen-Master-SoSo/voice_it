@@ -1,5 +1,5 @@
 [project]
-name = "voice-it"
+name = "voice_it"
 authors = [{name = "Leon Dionne", email = "ldionne@dridesign.sh.cn"}]
 readme = "README.md"
 license = {file = "LICENSE"}
