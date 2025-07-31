@@ -27,9 +27,10 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from PyQt5 import uic
 from PyQt5.QtCore import 	Qt, pyqtSignal, pyqtSlot, QCoreApplication, QObject, QSettings, \
 							QMetaObject, QRunnable, QSize, QThreadPool
-from PyQt5.QtGui import 	QFont, QGuiApplication, QIcon, QPixmap
+from PyQt5.QtGui import 	QFont, QGuiApplication, QIcon, QPixmap, QKeySequence
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QMainWindow, QPlainTextEdit, \
-							QPushButton, QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout, QWidget
+							QPushButton, QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout, \
+							QWidget, QShortcut
 from qt_extras import SigBlock, ShutUpQT
 from voice_it.qrcode import QRCodeDialog
 
@@ -155,13 +156,15 @@ class MainWindow(QMainWindow):
 			self.restoreGeometry(settings.value('geometry'))
 		if settings.contains('windowstate'):
 			self.restoreState(settings.value('windowstate'))
-		pixmap = QPixmap(join(dirname(__file__), 'res', 'voice-it.png'))
+		pixmap = QPixmap(join(dirname(__file__), 'res', 'qrcode.svg'))
 		self.b_icon.setIcon(QIcon(pixmap))
 		self.b_icon.clicked.connect(self.slot_show_qrcode)
 		self.b_copy.clicked.connect(self.slot_copy)
+		shortcut = QShortcut(QKeySequence('Ctrl+Q'), self)
+		shortcut.activated.connect(self.close)
 		sock = socket(AF_INET, SOCK_DGRAM)
 		sock.connect(('8.8.8.8', 7))
-		self.url = 'http://%s:8585' % sock.getsockname()[0]
+		self.url = f'http://{sock.getsockname()[0]}:8585'
 		self.lbl_link.setText(f'<a href="{self.url}">link</a>')
 		self.threadpool = QThreadPool()
 		server = Server()
